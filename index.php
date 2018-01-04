@@ -14,7 +14,7 @@ $LAUNCH = LTIX::requireData();
 // Model
 $p = $CFG->dbprefix;
 
-$instructor_form='start';
+$mygrades_form='start';
 
 
 $lstmt = $PDOX->queryDie(
@@ -35,7 +35,7 @@ if ( $links !== false && count($links) > 0 ) {
 }
 
 if ( isset($_GET['addActivity']) && $USER->instructor ) {
-	$instructor_form='addActivity';
+	$mygrades_form='addActivity';
 	$_SESSION['success'] = __('Add new activity');
 }
 
@@ -68,12 +68,27 @@ if ( isset($_POST['newActivityButton']) && $USER->instructor ) {
 	header( 'Location: '.addSession('index.php') ) ;
 //    return;
 }
-
-/*
-if ( isset($ GET['activity_id']) {
+//+Experimentell
+if ( isset($_GET['activity_id'])) {
+	$mygrades_form='activity';
+	$activity_id=$_GET['activity_id'];
+	$lstmt = $PDOX->queryDie(
+		"SELECT definition
+		FROM {$p}mygradesActivities
+		WHERE context_id = :CID AND id_sha256 = :SID",
+		array(":CID" => $CONTEXT->id, ":SID" => $activity_id)
+	);
+	if ($lstmt->success) {
+		$defarray = $lstmt->fetchAll();
+		$def=$defarray[0];
+		//$a_title=$def
+		$a_title=json_decode($def['definition'])->title;
+	} else {
+		$_SESSION['error'] = __('Activity not found');
+	}
 
 }
-*/
+//-Experimentell
 
 // View
 $OUTPUT->header();
@@ -85,39 +100,83 @@ echo("<!-- Handlebars version of the tool -->\n");
 echo('<div id="mygrades-div"><img src="'.$OUTPUT->getSpinnerUrl().'"></div>'."\n");
 
 $OUTPUT->footerStart();
-$OUTPUT->templateInclude(array('mygrades', 'newActivity'));
+$OUTPUT->templateInclude(array('mygrades', 'newActivity', 'activity', 'error'));
 
-if ( $USER->instructor && $instructor_form == 'start') {
-?>
-<script>
-$(document).ready(function(){
-        context = {
-            'instructor' : true,
-			'instructorStart': true,
-			'activityList': <?php echo json_encode($activity_list); ?>
-        };
-        tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);
-});
-</script>
-
-
-<?php } elseif ( $USER->instructor && $instructor_form == 'addActivity' ) {
-?>
-<script>
-$(document).ready(function(){
-        tsugiHandlebarsToDiv('mygrades-div', 'newActivity', {]);
-});
-</script>
-<?php
-} else { ?>
-<script>
-$(document).ready(function(){
-	context = {
-			'activityList': <?php echo json_encode($activity_list); ?>
-		};
-    tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);
-});
-</script>
-<?php
+if ($USER->instructor) {
+	switch ($mygrades_form) {
+		case 'start':
+			?>
+			<script>
+			$(document).ready(function(){
+					context = {
+						'instructor' : true,
+						'instructorStart': true,
+						'activityList': <?php echo json_encode($activity_list); ?>
+					};
+					tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);
+			});
+			</script>
+			<?php
+			break;
+		case 'addActivity':
+			?>
+			<script>
+			$(document).ready(function(){
+					tsugiHandlebarsToDiv('mygrades-div', 'newActivity', {});
+			});
+			</script>
+			<?php
+			break;
+		case 'activity': 
+			?>
+			<script>
+			$(document).ready(function(){
+				context = {
+					'aTitle': '<?php echo $a_title; ?>'
+				};
+				tsugiHandlebarsToDiv('mygrades-div', 'activity', context);
+			});
+			</script>
+			<?php
+			break;
+		default:
+			?>
+			<script>
+			$(document).ready(function(){
+				context = {
+						'mygradesForm': <?php echo $mygrades_form; ?>
+					};
+				tsugiHandlebarsToDiv('mygrades-div', 'error', context);
+			});
+			</script>
+			<?php
+	}
+} else {
+	switch ($mygrades_form) {
+		case 'start':
+			?>
+			<script>
+			$(document).ready(function(){
+				context = {
+						'activityList': <?php echo json_encode($activity_list); ?>
+					};
+				tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);
+			});
+			</script>
+			<?php
+			break;
+		default:
+			?>
+			<script>
+			$(document).ready(function(){
+				context = {
+						'mygradesForm': '<?php echo $mygrades_form; ?>'
+					};
+				tsugiHandlebarsToDiv('mygrades-div', 'error', context);
+			});
+			</script>
+			<?php
+	}
 }
+
 $OUTPUT->footerEnd();
