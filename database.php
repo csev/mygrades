@@ -9,16 +9,30 @@ $DATABASE_UNINSTALL = array(
 $DATABASE_INSTALL = array(
 array( "{$CFG->dbprefix}mygradesActivities",
 "create table {$CFG->dbprefix}mygradesActivities (
-    context_id     INTEGER NOT NULL,
-    id     		VARCHAR(256),
-	id_sha256	CHAR(64),
+    context     INTEGER NOT NULL,
+    activity_id     		INT NOT NULL AUTO_INCREMENT,
     definition  MEDIUMTEXT,
 
     CONSTRAINT `{$CFG->dbprefix}mygradesActivities_ibfk_1`
-        FOREIGN KEY (`context_id`)
+        FOREIGN KEY (`context`)
         REFERENCES `{$CFG->dbprefix}lti_context` (`context_id`)
         ON DELETE CASCADE ON UPDATE CASCADE,
-		UNIQUE(id_sha256)
+		UNIQUE(activity_id)
+
+    
+) ENGINE = InnoDB DEFAULT CHARSET=utf8"),
+array( "{$CFG->dbprefix}mygradesStatements",
+"create table {$CFG->dbprefix}mygradesStatements (
+    statement_id     INT NOT NULL AUTO_INCREMENT,
+	activity		INT,
+    agent     		TEXT,
+	grade			FLOAT,
+
+    CONSTRAINT `{$CFG->dbprefix}mygradesStatements_ibfk_1`
+        FOREIGN KEY (`activity`)
+        REFERENCES `{$CFG->dbprefix}mygradesActivities` (`activity_id`)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+		UNIQUE(statement_id)
 
     
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8")

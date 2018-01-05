@@ -1,3 +1,11 @@
 <!-- Template for a single activity -->
 activity template started
 <h3>{{aTitle}}</h3>
+
+<form method="get">
+	<input type="hidden" name="currentActivity" value="{{aId}}"/>
+	{{#if instructor}}
+		<button name="deleteActivity" value="delete">{{__ "Delete Activity" }}</button>
+	{{/if}}
+</form>
+Activity: {{aId}}

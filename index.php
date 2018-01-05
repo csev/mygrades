@@ -16,24 +16,6 @@ $p = $CFG->dbprefix;
 
 $mygrades_form='start';
 
-
-$lstmt = $PDOX->queryDie(
-	"SELECT DISTINCT L.id_sha256 AS id_sha256, L.definition AS definition
-	FROM {$p}mygradesActivities AS L
-	WHERE L.context_id = :CID",
-	array(":CID" => $CONTEXT->id)
-);
-$links = $lstmt->fetchAll();
-
-$activity_list=[];
-if ( $links !== false && count($links) > 0 ) {
-	foreach($links as $link) {
-		$a_id=addSession('index.php?activity_id='.$link['id_sha256']);
-		$a_title=json_decode($link['definition'])->title;
-		$activity_list[]=['activityId' => $a_id, 'activityTitle' => $a_title];
-	}
-}
-
 if ( isset($_GET['addActivity']) && $USER->instructor ) {
 	$mygrades_form='addActivity';
 	$_SESSION['success'] = __('Add new activity');
@@ -45,50 +27,72 @@ if ( isset($_POST['cancel']) ) {
 }
 if ( isset($_POST['newActivityButton']) && $USER->instructor ) {
 	$title=$_POST['newActivityTitle'];
-	$id=$_POST['newActivityId'];
-	if ($id == '') {
-		$id=rand();
-	}
-	$id_sha256 = lti_sha256($id);
 	$stmt=$PDOX->queryReturnError("INSERT INTO {$p}mygradesActivities
-            (context_id, definition, id,id_sha256)
-            VALUES ( :CI, :DE, :ID, :IS )",
+            (context, definition)
+            VALUES ( :CI, :DE)",
             array(
                 ':CI' => $CONTEXT->id,
-                ':DE' => '{"title": "'.$title.'"}',
-                ':ID' => $id,
-				':IS' => $id_sha256
+                ':DE' => '{"title": "'.$title.'"}'
             )
         );
 	if ($stmt->success) {
 		$_SESSION['success'] = __('New activity added');
 	} else {
-		$_SESSION['error'] = __('URL already used - must be unique.');
+		$_SESSION['error'] = __('ERROR saving activity.'); // We should check whether the combination of context and title is unique
 	}
 	header( 'Location: '.addSession('index.php') ) ;
-//    return;
 }
-//+Experimentell
+
 if ( isset($_GET['activity_id'])) {
 	$mygrades_form='activity';
-	$activity_id=$_GET['activity_id'];
-	$lstmt = $PDOX->queryDie(
-		"SELECT definition
-		FROM {$p}mygradesActivities
-		WHERE context_id = :CID AND id_sha256 = :SID",
-		array(":CID" => $CONTEXT->id, ":SID" => $activity_id)
-	);
-	if ($lstmt->success) {
-		$defarray = $lstmt->fetchAll();
-		$def=$defarray[0];
-		//$a_title=$def
-		$a_title=json_decode($def['definition'])->title;
-	} else {
-		$_SESSION['error'] = __('Activity not found');
-	}
-
 }
-//-Experimentell
+
+if ( isset($_GET['deleteActivity']) && $USER->instructor ) {
+	$PDOX->queryDie("DELETE FROM {$p}mygradesActivities WHERE activity_id = :IDS",
+            array(':IDS' => $_GET['currentActivity'])
+    );
+    $_SESSION['success'] = __('Activity removed');
+    //header( 'Location: '.addSession('index.php') ) ;
+	$mygrades_form='start';
+}
+
+switch ($mygrades_form) {
+	case 'start':
+		$lstmt = $PDOX->queryDie(
+			"SELECT DISTINCT activity_id, definition
+			FROM {$p}mygradesActivities
+			WHERE context = :CID",
+			array(":CID" => $CONTEXT->id)
+		);
+		$links = $lstmt->fetchAll();
+
+		$activity_list=[];
+		if ( $links !== false && count($links) > 0 ) {
+			foreach($links as $link) {
+				$a_id=addSession('index.php?activity_id='.$link['activity_id']);
+				$a_title=json_decode($link['definition'])->title;
+				$activity_list[]=['activityId' => $a_id, 'activityTitle' => $a_title];
+			}
+		}
+		break;
+	case 'activity':
+		$a_id=$_GET['activity_id'];
+		$lstmt = $PDOX->queryDie(
+			"SELECT definition
+			FROM {$p}mygradesActivities
+			WHERE context = :CID AND activity_id = :SID",
+			array(":CID" => $CONTEXT->id, ":SID" => $a_id)
+		);
+		if ($lstmt->success) {
+			$defarray = $lstmt->fetchAll();
+			$def=$defarray[0];
+			$a_title=json_decode($def['definition'])->title;
+		} else {
+			$_SESSION['error'] = __('Activity not found');
+		}
+		break;
+	default:
+}
 
 // View
 $OUTPUT->header();
@@ -122,7 +126,10 @@ if ($USER->instructor) {
 			?>
 			<script>
 			$(document).ready(function(){
-					tsugiHandlebarsToDiv('mygrades-div', 'newActivity', {});
+					context = {
+						'cancelTarget': "<?php echo addSession('index.php'); ?>"
+					}
+					tsugiHandlebarsToDiv('mygrades-div', 'newActivity', context);
 			});
 			</script>
 			<?php
@@ -132,7 +139,9 @@ if ($USER->instructor) {
 			<script>
 			$(document).ready(function(){
 				context = {
-					'aTitle': '<?php echo $a_title; ?>'
+					'instructor' : true,
+					'aTitle': '<?php echo $a_title; ?>',
+					'aId': '<?php echo $a_id; ?>'
 				};
 				tsugiHandlebarsToDiv('mygrades-div', 'activity', context);
 			});
@@ -151,7 +160,7 @@ if ($USER->instructor) {
 			</script>
 			<?php
 	}
-} else {
+} else { // Student
 	switch ($mygrades_form) {
 		case 'start':
 			?>
@@ -161,6 +170,19 @@ if ($USER->instructor) {
 						'activityList': <?php echo json_encode($activity_list); ?>
 					};
 				tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);
+			});
+			</script>
+			<?php
+			break;
+		case 'activity': 
+			?>
+			<script>
+			$(document).ready(function(){
+				context = {
+					'aTitle': '<?php echo $a_title; ?>',
+					'aId': '<?php echo $a_id; ?>'
+				};
+				tsugiHandlebarsToDiv('mygrades-div', 'activity', context);
 			});
 			</script>
 			<?php

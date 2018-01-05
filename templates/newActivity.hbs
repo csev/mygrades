@@ -1,10 +1,7 @@
-{{__ "newActivity.hbs launched:" }}
 <form method="post">
 	<label for="newActivityTitle">{{__ "Activity title"}}</label>
 	<input type="text" name="newActivityTitle" required/>
-	<label for="newActivityId">{{__ "URL"}}</label>
-	<input type="url" name="newActivityId"/>
 	<button name="newActivityButton">{{__ "Send"}}</button>
-	<button name="cancel">{{__ "Cancel"}}</button>
+	<button onclick="window.location='{{cancelTarget}}'; return false;">{{__ "Cancel"}}</button>
 </form>
 
