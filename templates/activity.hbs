@@ -1,11 +1,31 @@
 <!-- Template for a single activity -->
 activity template started
 <h3>{{aTitle}}</h3>
-
+{{#if instructor}}
+	{{#if nrResults }}
+		<h4>{{__ "Summary of Results"}}</h4>
+	{{else}}
+		<b>{{__ "Please upload results!"}}</b>
+		<p>{{__ "Lines in the file to be uploaded must have the form"}} <em>email;grade</em>.</p>
+		<p>{{__ "Grades must be numbers between 0 and 1, indicating the ratio"}} <em>individual score/maximum score</em>.</p>
+		<form enctype="multipart/form-data" action="{{action}}" method="POST">
+			<!-- MAX_FILE_SIZE muss vor dem Dateiupload Input Feld stehen -->
+			<input type="hidden" name="MAX_FILE_SIZE" value="30000" />
+			<!-- Der Name des Input Felds bestimmt den Namen im $_FILES Array -->
+			<label for="resultsFile">{{__ "File to upload"}}: </label>
+			<input name="resultsFile" type="file" />
+			<input type="hidden" name="currentActivity" value="{{aId}}"/>
+			<input type="submit" value="{{__ 'Send File'}}" />
+		</form>
+	{{/if}}
+{{/if}}
 <form method="get">
 	<input type="hidden" name="currentActivity" value="{{aId}}"/>
 	{{#if instructor}}
 		<button name="deleteActivity" value="delete">{{__ "Delete Activity" }}</button>
 	{{/if}}
 </form>
-Activity: {{aId}}
+Activity: {{aId}},
+Results: {{nrResults}}
+Action: {{action}}
+File: {{fileName}}

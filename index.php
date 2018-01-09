@@ -1,204 +1,1 @@
-<?php
-require_once "../config.php";
-
-// The Tsugi PHP API Documentation is available at:
-// http://do1.dr-chuck.com/tsugi/phpdoc
-
-use \Tsugi\Core\Settings;
-use \Tsugi\Core\LTIX;
-use \Tsugi\Util\Net;
-
-// No parameter means we require CONTEXT, USER, and LINK
-$LAUNCH = LTIX::requireData();
-
-// Model
-$p = $CFG->dbprefix;
-
-$mygrades_form='start';
-
-if ( isset($_GET['addActivity']) && $USER->instructor ) {
-	$mygrades_form='addActivity';
-	$_SESSION['success'] = __('Add new activity');
-}
-
-if ( isset($_POST['cancel']) ) {
-	header( 'Location: '.addSession('index.php') ) ;
-	return;
-}
-if ( isset($_POST['newActivityButton']) && $USER->instructor ) {
-	$title=$_POST['newActivityTitle'];
-	$stmt=$PDOX->queryReturnError("INSERT INTO {$p}mygradesActivities
-            (context, definition)
-            VALUES ( :CI, :DE)",
-            array(
-                ':CI' => $CONTEXT->id,
-                ':DE' => '{"title": "'.$title.'"}'
-            )
-        );
-	if ($stmt->success) {
-		$_SESSION['success'] = __('New activity added');
-	} else {
-		$_SESSION['error'] = __('ERROR saving activity.'); // We should check whether the combination of context and title is unique
-	}
-	header( 'Location: '.addSession('index.php') ) ;
-}
-
-if ( isset($_GET['activity_id'])) {
-	$mygrades_form='activity';
-}
-
-if ( isset($_GET['deleteActivity']) && $USER->instructor ) {
-	$PDOX->queryDie("DELETE FROM {$p}mygradesActivities WHERE activity_id = :IDS",
-            array(':IDS' => $_GET['currentActivity'])
-    );
-    $_SESSION['success'] = __('Activity removed');
-    //header( 'Location: '.addSession('index.php') ) ;
-	$mygrades_form='start';
-}
-
-switch ($mygrades_form) {
-	case 'start':
-		$lstmt = $PDOX->queryDie(
-			"SELECT DISTINCT activity_id, definition
-			FROM {$p}mygradesActivities
-			WHERE context = :CID",
-			array(":CID" => $CONTEXT->id)
-		);
-		$links = $lstmt->fetchAll();
-
-		$activity_list=[];
-		if ( $links !== false && count($links) > 0 ) {
-			foreach($links as $link) {
-				$a_id=addSession('index.php?activity_id='.$link['activity_id']);
-				$a_title=json_decode($link['definition'])->title;
-				$activity_list[]=['activityId' => $a_id, 'activityTitle' => $a_title];
-			}
-		}
-		break;
-	case 'activity':
-		$a_id=$_GET['activity_id'];
-		$lstmt = $PDOX->queryDie(
-			"SELECT definition
-			FROM {$p}mygradesActivities
-			WHERE context = :CID AND activity_id = :SID",
-			array(":CID" => $CONTEXT->id, ":SID" => $a_id)
-		);
-		if ($lstmt->success) {
-			$defarray = $lstmt->fetchAll();
-			$def=$defarray[0];
-			$a_title=json_decode($def['definition'])->title;
-		} else {
-			$_SESSION['error'] = __('Activity not found');
-		}
-		break;
-	default:
-}
-
-// View
-$OUTPUT->header();
-$OUTPUT->bodyStart();
-$OUTPUT->flashMessages();
-$OUTPUT->welcomeUserCourse();
-
-echo("<!-- Handlebars version of the tool -->\n");
-echo('<div id="mygrades-div"><img src="'.$OUTPUT->getSpinnerUrl().'"></div>'."\n");
-
-$OUTPUT->footerStart();
-$OUTPUT->templateInclude(array('mygrades', 'newActivity', 'activity', 'error'));
-
-if ($USER->instructor) {
-	switch ($mygrades_form) {
-		case 'start':
-			?>
-			<script>
-			$(document).ready(function(){
-					context = {
-						'instructor' : true,
-						'instructorStart': true,
-						'activityList': <?php echo json_encode($activity_list); ?>
-					};
-					tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);
-			});
-			</script>
-			<?php
-			break;
-		case 'addActivity':
-			?>
-			<script>
-			$(document).ready(function(){
-					context = {
-						'cancelTarget': "<?php echo addSession('index.php'); ?>"
-					}
-					tsugiHandlebarsToDiv('mygrades-div', 'newActivity', context);
-			});
-			</script>
-			<?php
-			break;
-		case 'activity': 
-			?>
-			<script>
-			$(document).ready(function(){
-				context = {
-					'instructor' : true,
-					'aTitle': '<?php echo $a_title; ?>',
-					'aId': '<?php echo $a_id; ?>'
-				};
-				tsugiHandlebarsToDiv('mygrades-div', 'activity', context);
-			});
-			</script>
-			<?php
-			break;
-		default:
-			?>
-			<script>
-			$(document).ready(function(){
-				context = {
-						'mygradesForm': <?php echo $mygrades_form; ?>
-					};
-				tsugiHandlebarsToDiv('mygrades-div', 'error', context);
-			});
-			</script>
-			<?php
-	}
-} else { // Student
-	switch ($mygrades_form) {
-		case 'start':
-			?>
-			<script>
-			$(document).ready(function(){
-				context = {
-						'activityList': <?php echo json_encode($activity_list); ?>
-					};
-				tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);
-			});
-			</script>
-			<?php
-			break;
-		case 'activity': 
-			?>
-			<script>
-			$(document).ready(function(){
-				context = {
-					'aTitle': '<?php echo $a_title; ?>',
-					'aId': '<?php echo $a_id; ?>'
-				};
-				tsugiHandlebarsToDiv('mygrades-div', 'activity', context);
-			});
-			</script>
-			<?php
-			break;
-		default:
-			?>
-			<script>
-			$(document).ready(function(){
-				context = {
-						'mygradesForm': '<?php echo $mygrades_form; ?>'
-					};
-				tsugiHandlebarsToDiv('mygrades-div', 'error', context);
-			});
-			</script>
-			<?php
-	}
-}
-
-$OUTPUT->footerEnd();
+<?phprequire_once "../config.php";// The Tsugi PHP API Documentation is available at:// http://do1.dr-chuck.com/tsugi/phpdocuse \Tsugi\Util\Net;use \Tsugi\Core\Settings;use \Tsugi\Core\LTIX;use \Tsugi\Blob\BlobUtil;if (BlobUtil::emptyPostSessionLost()) {    die('Error: Maximum size of ' . BlobUtil::maxUpload() . 'MB exceeded.');}// No parameter means we require CONTEXT, USER, and LINK$LAUNCH = LTIX::requireData();// Model$p = $CFG->dbprefix;// Routing$mygrades_form = 'start';if (isset($_GET['addActivity']) && $USER->instructor) {    $mygrades_form = 'addActivity';    $_SESSION['success'] = __('Add new activity');}if (isset($_POST['cancel'])) {    header('Location: ' . addSession('index.php'));    return;}if (isset($_POST['newActivityButton']) && $USER->instructor) {    $title = $_POST['newActivityTitle'];    $stmt = $PDOX->queryReturnError("INSERT INTO {$p}mygradesActivities            (context, definition)            VALUES ( :CI, :DE)",        array(            ':CI' => $CONTEXT->id,            ':DE' => '{"title": "' . $title . '"}'        )    );    if ($stmt->success) {        $_SESSION['success'] = __('New activity added');    } else {        $_SESSION['error'] = __('ERROR saving activity.'); // We should check whether the combination of context and title is unique    }    header('Location: ' . addSession('index.php'));}if (isset($_GET['activity_id'])) {    $a_id = $_GET['activity_id'];    $filename = "No File";    $mygrades_form = 'activity';}if (isset($_FILES['resultsFile'])) {    $fdes = $_FILES['resultsFile'];    // Sanity-check the file    $safety = BlobUtil::validateUpload($fdes);    if ($safety !== true) {        $_SESSION['error'] = __("Error: ") . $safety;        error_log("Upload Error: " . $safety);        header('Location: ' . addSession('index'));        return;    }    $data = BlobUtil::uploadFileToString($fdes, false);    echo("<h1>GOT SOME DATA!</h1>\n");    echo("<pre>\n");    echo($data);    echo("</pre>\n");    return;}if (isset($_POST['currentActivity'])) {    // $filename=$_FILES['resultsFile']['tmp_name'];    $a_id = $_POST['currentActivity'];    $filename = "Kein File";    $mygrades_form = 'activity';}if (isset($_GET['deleteActivity']) && $USER->instructor) {    $PDOX->queryDie("DELETE FROM {$p}mygradesActivities WHERE activity_id = :IDS",        array(':IDS' => $_GET['currentActivity'])    );    $_SESSION['success'] = __('Activity removed');    //header( 'Location: '.addSession('index.php') ) ;    $mygrades_form = 'start';}switch ($mygrades_form) {    case 'start':        $lstmt = $PDOX->queryDie(            "SELECT DISTINCT activity_id, definition			FROM {$p}mygradesActivities			WHERE context = :CID",            array(":CID" => $CONTEXT->id)        );        $links = $lstmt->fetchAll();        $activity_list = [];        if ($links !== false && count($links) > 0) {            foreach ($links as $link) {                $a_id = addSession('index.php?activity_id=' . $link['activity_id']);                $a_title = json_decode($link['definition'])->title;                $activity_list[] = ['activityId' => $a_id, 'activityTitle' => $a_title];            }        }        break;    case 'activity':        $lstmt = $PDOX->queryDie(            "SELECT definition			FROM {$p}mygradesActivities			WHERE context = :CID AND activity_id = :AID",            array(":CID" => $CONTEXT->id, ":AID" => $a_id)        );        if ($lstmt->success) {            $defarray = $lstmt->fetchAll();            $def = $defarray[0];            $a_title = json_decode($def['definition'])->title;        } else {            $_SESSION['error'] = __('Activity not found');        }        break;    default:}if ($USER->instructor) {    switch ($mygrades_form) {        case 'activity':            {                $stmts = $PDOX->queryDie(                    "SELECT statement_id, grade					FROM {$p}mygradesStatements					WHERE activity = :AID",                    array(":AID" => $a_id)                );                if ($stmts->success) {                    $stmts_array = $stmts->fetchAll();                    $nr_results = count($stmts_array);                } else {                    $_SESSION['error'] = __('Could not retrieve grades for this activity');                }            }            $action = addSession('index.php');            break;        default:    }}// View$OUTPUT->header();// Breakpoint?/*if ( isset($_POST['currentActivity'])) {	header( 'Location: '.addSession('index.php') ) ;	return;}*/$OUTPUT->bodyStart();// Breakpoint?if (isset($_POST['currentActivity'])) {    header('Location: ' . addSession('index.php'));    return;}$OUTPUT->flashMessages();$OUTPUT->welcomeUserCourse();echo("<!-- Handlebars version of the tool -->\n");echo('<div id="mygrades-div"><img src="' . $OUTPUT->getSpinnerUrl() . '"></div>' . "\n");$OUTPUT->footerStart();$OUTPUT->templateInclude(array('mygrades', 'newActivity', 'activity', 'error'));if ($USER->instructor) {    switch ($mygrades_form) {        case 'start':            ?>            <script>                $(document).ready(function () {                    context = {                        'instructor': true,                        'activityList': <?php echo json_encode($activity_list); ?>                    };                    tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);                });            </script>            <?php            break;        case 'addActivity':            ?>            <script>                $(document).ready(function () {                    context = {                        'cancelTarget': "<?php echo addSession('index.php'); ?>"                    };                    tsugiHandlebarsToDiv('mygrades-div', 'newActivity', context);                });            </script>            <?php            break;        case 'activity':            ?>            <script>                $(document).ready(function () {                    context = {                        'instructor': true,                        'aTitle': '<?php echo $a_title; ?>',                        'aId': '<?php echo $a_id; ?>',                        'nrResults': <?php echo $nr_results; ?>,                        'fileName': '<?php echo $filename; ?>',                        'action': '<?php echo $action; ?>'                    };                    tsugiHandlebarsToDiv('mygrades-div', 'activity', context);                });            </script>            <?php            break;        default:            ?>            <script>                $(document).ready(function () {                    context = {                        'mygradesForm': <?php echo $mygrades_form; ?>                    };                    tsugiHandlebarsToDiv('mygrades-div', 'error', context);                });            </script>        <?php    }} else { // Student    switch ($mygrades_form) {        case 'start':            ?>            <script>                $(document).ready(function () {                    context = {                        'activityList': <?php echo json_encode($activity_list); ?>                    };                    tsugiHandlebarsToDiv('mygrades-div', 'mygrades', context);                });            </script>            <?php            break;        case 'activity':            ?>            <script>                $(document).ready(function () {                    context = {                        'aTitle': '<?php echo $a_title; ?>',                        'aId': '<?php echo $a_id; ?>'                    };                    tsugiHandlebarsToDiv('mygrades-div', 'activity', context);                });            </script>            <?php            break;        default:            ?>            <script>                $(document).ready(function () {                    context = {                        'mygradesForm': '<?php echo $mygrades_form; ?>'                    };                    tsugiHandlebarsToDiv('mygrades-div', 'error', context);                });            </script>        <?php    }}$OUTPUT->footerEnd();

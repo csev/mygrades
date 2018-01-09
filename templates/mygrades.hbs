@@ -1,25 +1,24 @@
 {{#if activityList }}
 <p><b>{{__ "Select Activity"}}:</b></p>
 	<div class="btn-group">
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-      {{__ "Activities"}}
-      <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu">
-		{{#each activityList}}
-			<li><a href="#" onclick="window.location='{{this.activityId}}'">{{ this.activityTitle }}</a></li>
-		{{/each}}
-	</ul>
+		<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+		  {{__ "Activities"}}
+		  <span class="caret"></span>
+		</button>
+		<ul class="dropdown-menu">
+			{{#each activityList}}
+				<li><a href="#" onclick="window.location='{{this.activityId}}'">{{ this.activityTitle }}</a></li>
+			{{/each}}
+		</ul>
+	</div>
 {{/if}}
 {{#if instructor }}
-	{{#if instructorStart }}
-		<br/><br/>
+	<br/><br/>
 	<div>
 		<form method="get">
 			<button name="addActivity" value="new">{{__ "Add Activity" }}</button>
 		</form>
 	</div>
-	{{/if}}
 {{else}}
     <p>{{__ "Welcome"}}, student</p>
 {{/if}}
