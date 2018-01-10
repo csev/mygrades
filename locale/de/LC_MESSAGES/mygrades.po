@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Attend\n"
-"POT-Creation-Date: 2014-06-08 21:20-0500\n"
-"PO-Revision-Date: 2014-06-10 08:51-0500\n"
-"Last-Translator: Charles Severance <drchuck@gmail.com>\n"
+"Project-Id-Version: MyGrades\n"
+"POT-Creation-Date: 2018-01-10 21:20-0500\n"
+"PO-Revision-Date: 2018-01-10 22:51-0500\n"
+"Last-Translator: Ingo Dahn <dahn@dahn-research.eu>\n"
 "Language-Team: Testing 123 <drchuck@gmail.com>\n"
-"Language: es\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -15,38 +15,107 @@ msgstr ""
 "X-Poedit-KeywordsList: _;_e;__;_m\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: index.php:48
-msgid "Attendance Recorded..."
-msgstr "Asistencia registrada ..."
+msgid "Add new activity"
+msgstr "Neue Aktivität anlegen"
 
-#: index.php:50
-msgid "Code incorrect"
-msgstr "Un código incorrecto"
+msgid "New activity added"
+msgstr "Neue Aktivität angelegt"
 
-#: index.php:63
-msgid "Enter code:"
-msgstr "Introducir código:"
+msgid "ERROR saving activity."
+msgstr "FEHLER beim speichern der Aktivität"
 
-#: index.php:66
-msgid "Update code"
-msgstr "Código de actualización"
+msgid "Error: "
+msgstr "Fehler: "
 
-#: index.php:69
-msgid "Record attendance"
-msgstr "Récord de asistencia"
+msgid "Error in line "
+msgstr "Fehler in Zeile "
 
-#: index.php:78
-msgid "User"
-msgstr "Usuario"
+msgid "ERROR saving line "
+msgstr "FEHLER beim Speichern der Zeile "
 
-#: index.php:78
-msgid "Attendance"
-msgstr "Cuidados"
+msgid "Grades have been added."
+msgstr "Ergebnisse wurden hinzugefügt"
 
-#: index.php:78
-msgid "IP Address"
-msgstr "Dirección IP"
+msgid "Activity removed"
+msgstr "Aktivität gelöscht"
 
-#
+msgid "Activity not found"
+msgstr "Aktivität nicht gefunden"
+
+msgid "Could not retrieve grades for this activity"
+msgstr "Für diese Aktivität konnten keine Ergebnisse gefunden werden"
+
+msgid "Could not retrieve grades for"
+msgstr "Keine Ergebnisse gespeichert für:"
+
+msgid "Select Activity"
+msgstr "Aktivität wählen"
+
+msgid "Activities"
+msgstr "Aktivitäten"
+
+msgid "Summary of Results"
+msgstr "Zusammenfassung der Ergebnisse"
+
+msgid "Number of Participants"
+msgstr "Anzahl der Teilnehmer"
+
+msgid "Average"
+msgstr "Durchschnitt"
+
+msgid "Standard Deviation"
+msgstr "Standardabweichung"
+
+msgid "Please upload results"
+msgstr "Bitte Ergebnisse hochladen"
+
+msgid "Lines in the file to be uploaded must have the form"
+msgstr "Alle Zeilen in der hochgeladenen Datei müssen die folgende Form haben"
+
+msgid "email"
+msgstr "Email-Adresse"
+
+msgid "grade"
+msgstr "Ergebnis"
+
+msgid "Grades must be numbers between 0 and 1, indicating the ratio"
+msgstr "Als Ergebnisse werden Zahlen zwischen 0 und 1 erwartet. Sie beschreiben das Verhältnis"
+
+msgid "individual score/maximum score"
+msgstr "erreichte Punktzahl/maximal erreichbare Punktzahl"
+
+msgid "File to upload"
+msgstr "Datei"
+
+msgid "Send File"
+msgstr "Datei hochladen"
+
+msgid "You achieved"
+msgstr "Sie erreichten"
+
+msgid "of the points possible"
+msgstr "der möglichen Punkte"
+
+msgid "In the average, participants achieved"
+msgstr "Die Teilnehmer erreichten im Mittel"
+
+msgid "You performed better than"
+msgstr "Sie waren besser al"
+
+msgid "of"
+msgstr "von"
+
+msgid "participants"
+msgstr "Teilnehmern"
+
+msgid "There are no results available for your email address"
+msgstr "Es gibt keine Ergebnisse für Ihre Email-Adresse"
+
+msgid "Delete Activity"
+msgstr "Aktivität löschen"
+
+msgid "Back"
+msgstr "Zurück"
+
 msgid "Welcome"
 msgstr "Willkommen"

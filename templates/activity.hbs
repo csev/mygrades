@@ -10,8 +10,8 @@
         </dl>
 	{{else}}
 		<b>{{__ "Please upload results!"}}</b>
-		<p>{{__ "Lines in the file to be uploaded must have the form"}} <em>email;grade</em>.</p>
-		<p>{{__ "Grades must be numbers between 0 and 1, indicating the ratio"}} <em>individual score/maximum score</em>.</p>
+		<p>{{__ "Lines in the file to be uploaded must have the form"}} <em>{{__ "email"}};{{__ "grade"}}</em>.</p>
+		<p>{{__ "Grades must be numbers between 0 and 1, indicating the ratio"}} <em>{{ "individual score/maximum score"}}</em>.</p>
 		<form enctype="multipart/form-data" action="{{action}}" method="POST">
 			<!-- MAX_FILE_SIZE muss vor dem Dateiupload Input Feld stehen -->
 			<input type="hidden" name="MAX_FILE_SIZE" value="30000" />
@@ -24,11 +24,11 @@
 	{{/if}}
 {{else}}
     {{#if userRank}}
-        <p>{{__ "You achieved"}} {{ userGrade }} &percnt; {{__ "of the points possible"}}. {{__ "In the average, students achieved"}} {{ mean }}&percnt;.</p>
+        <p>{{__ "You achieved"}} {{ userGrade }} &percnt; {{__ "of the points possible"}}. {{__ "In the average, participants achieved"}} {{ mean }}&percnt;.</p>
         <p>{{__ "You performed better than" }} {{ userRank }} {{__ "of" }} {{ nrResults }} {{__ "participants" }}.</p>
     {{else}}
         <p>{{__ "There are no results available for your email address"}}  {{ userEmail }}.</p>
-        <p>{{__ "In the average, students achieved"}} {{ mean }}&percnt; {{__ "of the points possible"}}.</p>
+        <p>{{__ "In the average, participants achieved"}} {{ mean }}&percnt; {{__ "of the points possible"}}.</p>
     {{/if}}
 {{/if}}
 
