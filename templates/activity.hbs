@@ -4,9 +4,9 @@
 	{{#if nrResults }}
 		<h4>{{__ "Summary of Results"}}</h4>
         <dl>
-            <dd>{{__ "Number of Participants"}}:</dd><dt>{{ nrResults }}</dt>
-            <dd>{{__ "Average"}}:</dd><dt>{{ mean }} &percnt;</dt>
-            <dd>{{__ "Standard Deviation"}}:</dd><dt>{{ dev }}</dt>
+            <dt>{{__ "Number of Participants"}}:</dt><dd>{{ nrResults }}</dd>
+            <dt>{{__ "Average"}}:</dt><dd>{{ mean }} &percnt;</dd>
+            <dt>{{__ "Standard Deviation"}}:</dt><dd>{{ dev }}</dd>
         </dl>
 	{{else}}
 		<b>{{__ "Please upload results!"}}</b>
@@ -22,10 +22,21 @@
 			<input type="submit" value="{{__ 'Send File'}}" />
 		</form>
 	{{/if}}
+{{else}}
+    {{#if userRank}}
+        <p>{{__ "You achieved"}} {{ userGrade }} &percnt; {{__ "of the points possible"}}. {{__ "In the average, students achieved"}} {{ mean }}&percnt;.</p>
+        <p>{{__ "You performed better than" }} {{ userRank }} {{__ "of" }} {{ nrResults }} {{__ "participants" }}.</p>
+    {{else}}
+        <p>{{__ "There are no results available for your email address"}}  {{ userEmail }}.</p>
+        <p>{{__ "In the average, students achieved"}} {{ mean }}&percnt; {{__ "of the points possible"}}.</p>
+    {{/if}}
 {{/if}}
+
 <form method="get">
 	<input type="hidden" name="currentActivity" value="{{aId}}"/>
 	{{#if instructor}}
 		<button name="deleteActivity" value="delete">{{__ "Delete Activity" }}</button>
 	{{/if}}
+    <button onclick="window.location='{{cancelTarget}}'; return false;">{{__ "Back"}}</button>
 </form>
+
