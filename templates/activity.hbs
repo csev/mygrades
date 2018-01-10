@@ -1,9 +1,13 @@
 <!-- Template for a single activity -->
-activity template started
 <h3>{{aTitle}}</h3>
 {{#if instructor}}
 	{{#if nrResults }}
 		<h4>{{__ "Summary of Results"}}</h4>
+        <dl>
+            <dd>{{__ "Number of Participants"}}:</dd><dt>{{ nrResults }}</dt>
+            <dd>{{__ "Average"}}:</dd><dt>{{ mean }} &percnt;</dt>
+            <dd>{{__ "Standard Deviation"}}:</dd><dt>{{ dev }}</dt>
+        </dl>
 	{{else}}
 		<b>{{__ "Please upload results!"}}</b>
 		<p>{{__ "Lines in the file to be uploaded must have the form"}} <em>email;grade</em>.</p>
@@ -25,7 +29,3 @@ activity template started
 		<button name="deleteActivity" value="delete">{{__ "Delete Activity" }}</button>
 	{{/if}}
 </form>
-Activity: {{aId}},
-Results: {{nrResults}}
-Action: {{action}}
-File: {{fileName}}
