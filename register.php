@@ -1,12 +1,12 @@
 <?php
 
 $REGISTER_LTI2 = array(
-"name" => "Grade Book",
+"name" => "My Grade Book",
 "FontAwesome" => "fa-area-chart",
 "short_name" => "Grade Book",
 "description" => "This tool allows both the students and instructors to view their grades for
-a course. Instructors can upload files with grades  
-This tool also provides simple grade review and maintenance tools for instructors.",
+a course. Instructors can upload files with grades and get mean and standard deviation of grades. 
+Grades are visualised as positions on a race track.",
 "privacy_level" => "public",  // anonymous, name_only, public
     "messages" => array("launch"),
     "license" => "Apache",
@@ -24,6 +24,10 @@ This tool also provides simple grade review and maintenance tools for instructor
         "tool_configuration", "user_navigation"
         */
     ),
+    "screen_shots" => array(
+        "store/screen-01.png",
+        "store/screen-02.png"
+    )
 
 );
 
