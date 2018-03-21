@@ -45,6 +45,12 @@ msgstr "Aktivität nicht gefunden"
 msgid "Could not retrieve grades for this activity"
 msgstr "Für diese Aktivität konnten keine Ergebnisse gefunden werden"
 
+msgid "There is already some activity with title"
+msgstr "Es gibt bereits eine Aktivität mit dem Titel"
+
+msgid "Please, delete that or choose another title"
+msgstr "Bitte löschen Sie diese oder wählen Sie einen anderen Titel"
+
 msgid "Could not retrieve grades for"
 msgstr "Keine Ergebnisse gespeichert für"
 
@@ -66,8 +72,11 @@ msgstr "Durchschnitt"
 msgid "Standard Deviation"
 msgstr "Standardabweichung"
 
-msgid "Please upload results"
-msgstr "Bitte Ergebnisse hochladen"
+msgid "Please upload results!"
+msgstr "Bitte Ergebnisse hochladen!"
+
+msgid "Sample file"
+msgstr "Beispieldatei"
 
 msgid "Lines in the file to be uploaded must have the form"
 msgstr "Alle Zeilen in der hochgeladenen Datei müssen die folgende Form haben"

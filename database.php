@@ -2,7 +2,8 @@
 
 // The SQL to uninstall this tool
 $DATABASE_UNINSTALL = array(
-"drop table if exists {$CFG->dbprefix}mygradesActivities"
+"drop table if exists {$CFG->dbprefix}mygradesActivities",
+"drop table if exists {$CFG->dbprefix}mygradesStatements"
 );
 
 // The SQL to create the tables if they don't exist
